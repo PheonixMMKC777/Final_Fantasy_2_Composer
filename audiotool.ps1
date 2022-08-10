@@ -2,11 +2,14 @@
 
 $Path = Get-location
 [byte[]] $Sequence = @() 
-$LastOctave = 0xF0
+$LastOctave = 0x00 # if 0xF0 it reuses last octave in ram because 0xF0 always = 0xF0 as $LASTOCTAVE
 $bytecount = 0
 $GroupY = 120
 $Script:groupYHint = $groupY - 20
-$track1Sq1 = 0x35e6F
+#Cx are RESTS
+$LoopPointSet
+$allotedBytes = 255
+$SongStart = 0x35E6F
 function FindRom 
 {
 
@@ -59,7 +62,7 @@ $mainWin.Font = "Arial Bold, 10"
 $mainWin.Icon = [System.Drawing.Icon]::FromHandle((New-Object System.Drawing.Bitmap -Argument $stream).GetHIcon())
 
 $ByteHint = New-Object System.Windows.Forms.Label
-$ByteHint.Text = "$ByteCount / 255 Bytes"
+$ByteHint.Text = "$ByteCount / $allotedBytes"
 $ByteHint.Location = "100,$groupYHint"
 $ByteHint.Size = "340,20"
 
@@ -71,7 +74,7 @@ $noteHint.Size = "340,20"
 $SaveButton = New-Object System.Windows.Forms.Button
 $SaveButton.Text = "Save To ROM"
 $SaveButton.Size = "100,45"
-$SaveButton.Location = "450,20"
+$SaveButton.Location = "670,20"
 $SaveButton.BackColor = "pink"
 $savebutton.ADD_CLICK({SaveMusic})
 
@@ -85,6 +88,58 @@ $ByteBox.Text = "$Sequence"
 $ByteBox.Size = "400,150"
 $ByteBox.Location = "20,$GroupY "
 $ByteBox.BackColor = "White"
+
+$TrackList = New-Object System.Windows.Forms.ComboBox
+$TrackList.Size = "200,20"
+$TrackList.Location = "450,40 "
+
+
+$TrackList.Items.Add('Prelude SQ1')
+$TrackList.Items.Add('Prelude SQ2')
+
+$TrackList.Items.Add('Chocobo Theme SQ1')
+$TrackList.Items.Add('Chocobo Theme SQ2')
+$TrackList.Items.Add('Chocobo Theme Triangle')
+
+$TrackList.Items.Add('Main Theme SQ1')
+$TrackList.Items.Add('Main Theme SQ2')
+$TrackList.Items.Add('Main Theme Triangle')
+
+$TrackList.Items.Add('Fanfare Theme SQ1')
+$TrackList.Items.Add('Fanfare Theme SQ2')
+$TrackList.Items.Add('Fanfare Theme Triangle')
+
+$TrackList.Items.Add('Joins The Party Theme SQ1')
+$TrackList.Items.Add('Joins The Party Theme SQ2')
+$TrackList.Items.Add('Joins The Party Theme Triangle')
+
+$TrackList.Items.Add('Castle Pandemonium Theme SQ1')
+$TrackList.Items.Add('Castle Pandemonium SQ2')
+$TrackList.Items.Add('Castle Pandemonium Triangle')
+
+$TrackList.Items.Add('Ancient Castle Theme SQ1')
+$TrackList.Items.Add('Ancient Castle Theme SQ2')
+$TrackList.Items.Add('Ancient Castle Theme Triangle')
+
+$TrackList.SelectedIndex = 0
+
+
+
+
+$TrackList.Add_SelectedIndexChanged({
+    If ($TrackList.SelectedIndex -eq 0) {$Script:SongStart = 0x35E6F;$Script:allotedBytes = 255;$ByteHint.Text = "$ByteCount / $allotedBytes"}
+    If ($TrackList.SelectedIndex -eq 1) {$Script:SongStart = 0x35F6F;$Script:allotedBytes = 255;$ByteHint.Text = "$ByteCount / $allotedBytes"}
+
+    If ($TrackList.SelectedIndex -eq 2) {$Script:allotedBytes = 0;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:c = 0x35FA5}
+    If ($TrackList.SelectedIndex -eq 3) {$Script:allotedBytes = 0;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x35FE4}
+    If ($TrackList.SelectedIndex -eq 4) {$Script:allotedBytes = 0;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x35FF1} #Bass weird
+
+    If ($TrackList.SelectedIndex -eq 5) {$Script:allotedBytes = 55;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x36010}
+    If ($TrackList.SelectedIndex -eq 6) {$Script:allotedBytes = 4;  $ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x36062} #Main theme Echo in SQ2
+    If ($TrackList.SelectedIndex -eq 7) {$Script:allotedBytes = 272;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x3606C}
+
+    })
+
 
 
 $KeyList = New-Object System.Windows.Forms.ListBox
@@ -125,23 +180,32 @@ $SustainList.Items.Add('32nd')
 $SustainList.Items.Add('Dot 32nd')
 $SustainList.Items.Add('64th')
 
+
+
 $OctaveList = New-Object System.Windows.Forms.listbox
 $OctaveList.Size = "50,100"
 $OctaveList.Location = "450,$GroupY "
 
-$OctaveList.Items.Add('C1')
 $OctaveList.Items.Add('C2')
 $OctaveList.Items.Add('C3')
 $OctaveList.Items.Add('C4')
 $OctaveList.Items.Add('C5')
 $OctaveList.Items.Add('C6')
+$OctaveList.Items.Add('C7')
 
 $AddSelectedNote = New-Object System.Windows.Forms.Button
 $AddSelectedNote.Text = "Add"
 $AddSelectedNote.Size = "60,40 "
-$AddSelectedNote.Location = "445,230"
+$AddSelectedNote.Location = "445,225"
 $AddSelectedNote.ADD_CLICK({AddToSheet})
 $AddSelectedNote.BackColor = "yellow"
+
+$AddSelectedRest = New-Object System.Windows.Forms.Button
+$AddSelectedRest.Text = "Add `nRest"
+$AddSelectedRest.Size = "60,40 "
+$AddSelectedRest.Location = "445,275"
+$AddSelectedRest.ADD_CLICK({AddRestToSheet})
+$AddSelectedRest.BackColor = "Orange"
 
 $BeginLoopx2 = New-Object System.Windows.Forms.Button
 $BeginLoopx2.Text = "Set Point + Loop (x2)"
@@ -150,6 +214,7 @@ $BeginLoopx2.Location = "690,120"
 $beginLoopx2.BackColor = "lightblue"
 $BeginLoopx2.ADD_CLICK({$SCript:Sequence += 0xf8
                         $ByteBox.Text = "$Sequence" 
+
                         Byteupdate})
 
 $BeginLoopx3 = New-Object System.Windows.Forms.Button
@@ -204,6 +269,9 @@ $mainwin.controls.add($BeginLoopx5)
 $mainwin.controls.add($EnDLoop)
 $mainwin.controls.add($Bytehint)
 $mainwin.controls.add($savebutton)
+$mainwin.controls.add($tracklist)
+$mainwin.controls.add($addselectedrest)
+
 #draw
 $mainWin.ShowDialog()
 
@@ -269,6 +337,34 @@ $ByteBox.Text = "$Sequence"
 
 }
 
+Function AddRestToSheet {
+
+If ($SustainList.SelectedIndex -eq 0) {$SCript:RestByte = 0xC0} #Whole 
+If ($SustainList.SelectedIndex -eq 1) {$SCript:RestByte = 0xC2} #Half
+If ($SustainList.SelectedIndex -eq 2) {$SCript:RestByte = 0xC1} #D half 
+If ($SustainList.SelectedIndex -eq 3) {$SCript:RestByte = 0xC4} #T Half 
+If ($SustainList.SelectedIndex -eq 4) {$SCript:RestByte = 0xC5} #4th 
+If ($SustainList.SelectedIndex -eq 5) {$SCript:RestByte = 0xC3} #D 4th 
+If ($SustainList.SelectedIndex -eq 6) {$SCript:RestByte = 0xC7} #T 4th 
+If ($SustainList.SelectedIndex -eq 7) {$SCript:RestByte = 0xC8} #8th 
+If ($SustainList.SelectedIndex -eq 8) {$SCript:RestByte = 0xC6} #D 8th 
+If ($SustainList.SelectedIndex -eq 9) {$SCript:RestByte = 0xCA} #T 8th
+If ($SustainList.SelectedIndex -eq 10) {$SCript:RestByte = 0xCB} #16th 
+If ($SustainList.SelectedIndex -eq 11) {$SCript:RestByte = 0xC9} #D 16th 
+If ($SustainList.SelectedIndex -eq 12) {$SCript:RestByte = 0xCC} #T 16th
+If ($SustainList.SelectedIndex -eq 13) {$SCript:RestByte = 0xCE} #32nd
+If ($SustainList.SelectedIndex -eq 14) {$SCript:RestByte = 0xCE} #T 32nd 
+If ($SustainList.SelectedIndex -eq 15) {$SCript:RestByte = 0xCF} #64th
+$Script:Sequence += $RestByte
+$ByteBox.Text = "$Sequence"
+Byteupdate
+}
+
+
+
+
+
+
 Function Byteupdate{
 
 $SCript:byteCount++
@@ -283,11 +379,11 @@ $Rom = [System.IO.File]::ReadAllBytes("$Path\Final_Fantasy_2_(Tr).NES")
 $i = 0
 While ($i -lt $bytecount){
     $val = $Sequence[$i]
-    $ROM[$track1Sq1+$i] = $Val
+    $ROM[$SongStart+$i] = $Val
     $i++
     }
 
-[System.IO.File]::WriteAllBytes("$Path\FF2M.NES", $Rom)
+[System.IO.File]::WriteAllBytes("$Path\Final_Fantasy_2_(Tr).NES", $Rom)
 Write-host "Dec SEQ:$Sequence" -foregroundcolor yellow
 }
 
