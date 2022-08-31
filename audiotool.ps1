@@ -61,6 +61,7 @@ $mainwin.BackColor = "lightgreen"
 $mainWin.Font = "Arial Bold, 10"
 $mainWin.Icon = [System.Drawing.Icon]::FromHandle((New-Object System.Drawing.Bitmap -Argument $stream).GetHIcon())
 
+
 $ByteHint = New-Object System.Windows.Forms.Label
 $ByteHint.Text = "$ByteCount / $allotedBytes"
 $ByteHint.Location = "100,$groupYHint"
@@ -253,6 +254,82 @@ $EndLoop.ADD_CLICK({$SCript:Sequence += 0xfC
                         $ByteBox.Text = "$Sequence"
                         Byteupdate })
 
+
+
+$mainWin.KeyPreview = $True
+$mainwin.add_KeyDown({
+
+if ($PSItem.KeyCode -eq "NumPad1") {
+$OctaveList.SelectedIndex = 0
+}
+
+if ($PSItem.KeyCode -eq "NumPad2") {
+$OctaveList.SelectedIndex = 1
+}
+
+if ($PSItem.KeyCode -eq "NumPad3") {
+$OctaveList.SelectedIndex = 2
+}
+
+if ($PSItem.KeyCode -eq "NumPad4") {
+$OctaveList.SelectedIndex = 3
+}
+
+if ($PSItem.KeyCode -eq "NumPad5") {
+$OctaveList.SelectedIndex = 4
+}
+
+if ($PSItem.KeyCode -eq "NumPad6") {
+$OctaveList.SelectedIndex = 5
+}
+
+if ($PSItem.KeyCode -eq "NumPad7") {
+$SustainList.SelectedIndex = 0
+}
+
+if ($PSItem.KeyCode -eq "NumPad8") {
+$SustainList.SelectedIndex = 1
+}
+
+if ($PSItem.KeyCode -eq "NumPad9") {
+$SustainList.SelectedIndex = 4
+}
+
+if ($PSItem.KeyCode -eq "Add") {
+AddToSheet
+}
+
+if ($PSItem.KeyCode -eq "Subtract") {
+AddrestToSheet
+}
+
+if ($PSItem.KeyCode -eq "Divide") {
+$KeyList.selectedindex = $KeyList.selectedindex - 1
+if ($keylist.selectedindex -eq -2) {$KeyList.selectedindex = 0}
+if ($keylist.selectedindex -eq -1) {$KeyList.selectedindex = 0}
+}
+
+if ($PSItem.KeyCode -eq "Multiply") {
+$KeyList.selectedindex =$KeyList.selectedindex + 1 
+if ($keylist.selectedindex -eq 12) {$KeyList.selectedindex = 11}
+}
+
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #elems
 $mainwin.controls.add($MusicHeaderLabel)
 $mainwin.controls.add($KeyList)
@@ -390,5 +467,5 @@ Write-host "Dec SEQ:$Sequence" -foregroundcolor yellow
 
 
 
-
+loaddata
 Findrom
