@@ -14,7 +14,7 @@ function FindRom
 {
 
     #this thing has an eternal hatred for spaces
-    $CheckRom = Test-Path -Path "$Path\Final_Fantasy_2_(Tr).nes"
+    $CheckRom = Test-Path -Path "$Path\final_fantasy_2_(tr).nes"
 
     
     if ($CheckRom -eq $false) {
@@ -122,6 +122,10 @@ $TrackList.Items.Add('Ancient Castle Theme SQ1')
 $TrackList.Items.Add('Ancient Castle Theme SQ2')
 $TrackList.Items.Add('Ancient Castle Theme Triangle')
 
+$TrackList.Items.Add('Town Theme SQ1')
+$TrackList.Items.Add('Town Theme SQ2')
+$TrackList.Items.Add('Town Theme Triangle')
+
 $TrackList.SelectedIndex = 0
 
 
@@ -131,13 +135,17 @@ $TrackList.Add_SelectedIndexChanged({
     If ($TrackList.SelectedIndex -eq 0) {$Script:SongStart = 0x35E6F;$Script:allotedBytes = 255;$ByteHint.Text = "$ByteCount / $allotedBytes"}
     If ($TrackList.SelectedIndex -eq 1) {$Script:SongStart = 0x35F6F;$Script:allotedBytes = 255;$ByteHint.Text = "$ByteCount / $allotedBytes"}
 
-    If ($TrackList.SelectedIndex -eq 2) {$Script:allotedBytes = 0;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:c = 0x35FA5}
-    If ($TrackList.SelectedIndex -eq 3) {$Script:allotedBytes = 0;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x35FE4}
-    If ($TrackList.SelectedIndex -eq 4) {$Script:allotedBytes = 0;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x35FF1} #Bass weird
+    If ($TrackList.SelectedIndex -eq 2) {$Script:allotedBytes = 1;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x35FA5}
+    If ($TrackList.SelectedIndex -eq 3) {$Script:allotedBytes = 2;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x35FE4}
+    If ($TrackList.SelectedIndex -eq 4) {$Script:allotedBytes = 3;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x35FF1} #Bass weird
 
     If ($TrackList.SelectedIndex -eq 5) {$Script:allotedBytes = 55;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x36010}
     If ($TrackList.SelectedIndex -eq 6) {$Script:allotedBytes = 4;  $ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x36062} #Main theme Echo in SQ2
     If ($TrackList.SelectedIndex -eq 7) {$Script:allotedBytes = 272;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x3606C}
+
+    If ($TrackList.SelectedIndex -eq 20) {$Script:allotedBytes = 138;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x36b21 + 7}
+    If ($TrackList.SelectedIndex -eq 21) {$Script:allotedBytes = 138;  $ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x36bab+ 7} 
+    If ($TrackList.SelectedIndex -eq 22) {$Script:allotedBytes = 59;$ByteHint.Text = "$ByteCount / $allotedBytes"; $Script:SongStart = 0x36c35+ 7}
 
     })
 
@@ -451,21 +459,25 @@ Write-Host $byteCount -ForegroundColor Yellow
 
 Function SaveMusic {
 
-$Rom = [System.IO.File]::ReadAllBytes("$Path\Final_Fantasy_2_(Tr).NES")  
-
+$Rom = [System.IO.File]::ReadAllBytes("$Path\final_fantasy_2_(tr).nes.nes")  
+$SongDataTXT = @()
 $i = 0
 While ($i -lt $bytecount){
     $val = $Sequence[$i]
     $ROM[$SongStart+$i] = $Val
+    $SongDataTXT += $val
     $i++
     }
+    Remove-Item  -Path "$Path/output.txt" -ErrorAction SilentlyContinue
+$Sequence | Out-File "$path\output.txt" | Format-Hex
+[System.IO.File]::WriteAllBytes("$Path\ff2hackMUSIC.nes", $Rom)
 
-[System.IO.File]::WriteAllBytes("$Path\Final_Fantasy_2_(Tr).NES", $Rom)
+
 Write-host "Dec SEQ:$Sequence" -foregroundcolor yellow
 }
 
 
 
 
-loaddata
+
 Findrom
