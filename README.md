@@ -1,3 +1,6 @@
+# OUTDATED
+USE THIS INSTEAD: https://github.com/PheonixMMKC777/FINAL_FANTASY_2_SEQUENCER
+
 # Final_Fantasy_2_Composer
 WIP FF2J Sound composer
 
